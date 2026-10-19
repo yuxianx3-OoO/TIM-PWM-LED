@@ -93,7 +93,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   __HAL_TIM_CLEAR_FLAG(&htim2, TIM_FLAG_UPDATE); // Clear the update flag
   HAL_TIM_Base_Start_IT(&htim2);// Start the timer with interrupt
-
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1); // 开启TIM2的PWM输出，使用通道1
+  // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 500); // 设置CCR1寄存器的比较值为500，PWM占空比为50%
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -103,14 +104,24 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    uint32_t cnt = __HAL_TIM_GET_COUNTER(&htim2); // Get the current counter value
-    char text[50];
-    int len = snprintf(text, sizeof(text), "CNT=%lu\r\n", (unsigned long)cnt);
-    if (len > 0 && len < sizeof(text)) {
-        HAL_UART_Transmit(&huart1, (uint8_t*)text, len, HAL_MAX_DELAY);
-
+    for (int i = 0; i <= 1000; i += 10)
+    {
+        __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, i); // 设置CCR1寄存器的比较值为i，PWM占空比为i/1000
+        HAL_Delay(10); // 延时10毫秒
     }
-    HAL_Delay(200); 
+    for (int i = 1000; i >= 0; i -= 10)
+    {
+        __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, i); // 设置CCR1寄存器的比较值为i，PWM占空比为i/1000
+        HAL_Delay(10); // 延时10毫秒
+    }
+    // uint32_t cnt = __HAL_TIM_GET_COUNTER(&htim2); // Get the current counter value
+    // char text[50];
+    // int len = snprintf(text, sizeof(text), "CNT=%lu\r\n", (unsigned long)cnt);
+    // if (len > 0 && len < sizeof(text)) {
+    //     HAL_UART_Transmit(&huart1, (uint8_t*)text, len, HAL_MAX_DELAY);
+
+    // }
+    // HAL_Delay(200); 
   }
   /* USER CODE END 3 */
 }
