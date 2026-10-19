@@ -19,11 +19,12 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -88,6 +89,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_TIM2_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   __HAL_TIM_CLEAR_FLAG(&htim2, TIM_FLAG_UPDATE); // Clear the update flag
   HAL_TIM_Base_Start_IT(&htim2);// Start the timer with interrupt
@@ -101,6 +103,14 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    uint32_t cnt = __HAL_TIM_GET_COUNTER(&htim2); // Get the current counter value
+    char text[50];
+    int len = snprintf(text, sizeof(text), "CNT=%lu\r\n", (unsigned long)cnt);
+    if (len > 0 && len < sizeof(text)) {
+        HAL_UART_Transmit(&huart1, (uint8_t*)text, len, HAL_MAX_DELAY);
+
+    }
+    HAL_Delay(200); 
   }
   /* USER CODE END 3 */
 }
